@@ -22,7 +22,7 @@ class PlayerCell: UITableViewCell {
     }
     
     func imageForRating (rating:Int)->UIImage? {
-        let imgName = "\(rating)StarsSmall"
+        let imgName = (rating == 1 ? "1Star" : "\(rating)Stars") + "Small"
         
         return UIImage (named:imgName)
     }

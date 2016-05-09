@@ -1,5 +1,5 @@
 //
-//  PlayersViewController.swift
+//  GamePickerViewController.swift
 //  lab2
 //
 //  Created by Keith Choison on 5/8/16.
@@ -8,8 +8,26 @@
 
 import UIKit
 
-class PlayersViewController: UITableViewController {
-    var players:[Player] = playersData
+class GamePickerViewController: UITableViewController {
+    var games:[String] = [
+        "Angry Birds",
+        "Agar.io",
+        "Chess",
+        "Poker",
+        "Blackjack",
+        "Spin the Bottle",
+        "Tic-Tac-Toe",
+        "League of Legends",
+        "Neko Atsume"
+    ]
+    var selectedGame:String? {
+        didSet {
+            if let game = selectedGame {
+                selectedGameIndex = games.indexOf (game)!
+            }
+        }
+    }
+    var selectedGameIndex:Int? = 2 // since default game is Chess
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,31 +53,37 @@ class PlayersViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return players.count
+        return games.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("PlayerCell", forIndexPath: indexPath) as! PlayerCell
-        let player = players[indexPath.row] as Player
+        let cell = tableView.dequeueReusableCellWithIdentifier("GameCell", forIndexPath: indexPath)
+
+        // Configure the cell...
+        cell.textLabel?.text = games[indexPath.row]
         
-        cell.player = player
+        if indexPath.row == selectedGameIndex {
+            cell.accessoryType = .Checkmark
+        }else{
+            cell.accessoryType = .None
+        }
 
         return cell
     }
     
-    @IBAction func closePlayerDetailsModal (segue:UIStoryboardSegue){
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        tableView.deselectRowAtIndexPath (indexPath, animated:true)
         
-    }
-    
-    @IBAction func savePlayerDetail (segue:UIStoryboardSegue){
-        if let playerDetailsViewController = segue.sourceViewController as? PlayerDetailsViewController {
-            if let player = playerDetailsViewController.player {
-                players.append (player)
-                
-                let indexPath = NSIndexPath (forRow:players.count - 1, inSection:0)
-                tableView.insertRowsAtIndexPaths ([indexPath], withRowAnimation:.Automatic)
-            }
+        if let index = selectedGameIndex {
+            let cell = tableView.cellForRowAtIndexPath (NSIndexPath (forRow:index, inSection:0))
+            
+            cell?.accessoryType = .None
         }
+        
+        selectedGame = games[indexPath.row]
+        
+        let cell = tableView.cellForRowAtIndexPath (indexPath)
+        cell?.accessoryType = .Checkmark
     }
 
     /*
@@ -97,14 +121,20 @@ class PlayersViewController: UITableViewController {
     }
     */
 
-    /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
+        if segue.identifier == "SaveSelectedGame" {
+            if let cell = sender as? UITableViewCell {
+                let indexPath = tableView.indexPathForCell (cell)
+                
+                if let index = indexPath?.row {
+                    selectedGame = games[index]
+                }
+            }
+        }
     }
-    */
-
 }
